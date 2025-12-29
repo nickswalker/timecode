@@ -1,4 +1,4 @@
-About
+timecode
 -----
 
 Python module for manipulating SMPTE timecode. Supports all formats in the ST12 standard, 
@@ -6,8 +6,8 @@ as well as any arbitrary integer frame rates and some default str values of 23.9
 24, 25, 29.97, 30, 50, 59.94, 60 frame rates and milliseconds (1000 fps) and fractional 
 frame rates like "30000/1001".
 
-This library is a fork of the original PyTimeCode python library. You should  not use
-the two library together (PyTimeCode is not maintained and has known bugs).
+This library is a fork of [eoyilmaz's timecode](https://github.com/eoyilmaz/timecode) with several patches
+applied (all pending merge upstream). You must install it from source.
 
 The math behind the drop frame calculation is based on the
 [blog post of David Heidelberger](http://www.davidheidelberger.com/blog/?p=29).
@@ -92,6 +92,5 @@ The SMPTE standard limits the timecode with 24 hours. Even though, Timecode inst
 will show the current timecode inline with the SMPTE standard, it will keep counting the
 total frames without clipping it.
 
-Please report any bugs to the [GitHub](https://github.com/eoyilmaz/timecode) page.
 
 Copyright 2014 Joshua Banton and PyTimeCode developers.
