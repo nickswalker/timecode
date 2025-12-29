@@ -895,7 +895,25 @@ class Timecode(object):
         Returns:
             float: The seconds as float.
         """
-        return float(self.frames) / float(self._int_framerate)
+        time_value = float(self.frames) / float(self._int_framerate)
+        # Add a very small epsilon - just enough to ensure we're above the truncation point
+        # but not so much that we'd jump to the next frame
+        epsilon = 1e-10  # This is much smaller than 1/framerate for any reasonable framerate
+        return time_value + epsilon
+
+    if sys.version_info >= (3, 9):
+        # Python 3.9+ supports math.nextafter, which we can use
+        # to shift the float by the smallest possible amount
+        @property
+        def float(self) -> float:
+            """Return the seconds as float.
+
+            Returns:
+                float: The seconds as float.
+            """
+            import math
+            time_value = float(self.frames) / float(self._int_framerate)
+            return math.nextafter(time_value, math.inf)
 
 
 class TimecodeError(Exception):

@@ -3,6 +3,7 @@ import pytest
 
 from timecode import Timecode, TimecodeError
 
+import random
 
 @pytest.mark.parametrize(
     "args,kwargs", [
@@ -739,7 +740,8 @@ def test_toggle_fractional_frame_3():
 def test_timestamp_realtime_1():
     frames = 12345
     ts = frames*1/24
-    assert Timecode(24, frames=frames).to_realtime(True) == ts
+    realtime = Timecode(24, frames=frames).to_realtime(True)
+    assert abs(realtime - ts) < 1e-09
 
 
 def test_timestamp_realtime_2():
@@ -944,7 +946,7 @@ def test_bug_report_32():
     framerate = "30000/1001"
     seconds = 500
     tc1 = Timecode(framerate, start_seconds=seconds)
-    assert seconds == tc1.float
+    assert abs(tc1.float - seconds) < 1e-09
 
 
 def test_set_timecode_method():
@@ -1096,6 +1098,34 @@ def test_rollover_for_23_98():
     tc.add_frames(24)
     assert 2071873 == tc.frames
     assert "23:58:48:00" == tc.__repr__()
+
+@pytest.mark.parametrize(
+    "framerate", [
+        "23.976", "23.98", "24", "25", "29.97", "30", "50", "59.94", "60", "ms"
+    ]
+)
+def test_float_representation_roundtrip(framerate):
+    """Test float representation of Timecode."""
+    mismatched = 0
+    # Close enough to max frame across our supported framerates.
+    num_frames = Timecode(framerate, "24:00:00;00").frame_number
+    max_samples = 50_000
+
+    if num_frames <= max_samples:
+        frames_to_test = range(1, num_frames)
+    else:
+        # Not the most efficient sample allocation, but our range is pretty small.
+        random.seed(42)  # Fixed seed for repeatability
+        frames_to_test = sorted(random.sample(range(1, num_frames), max_samples))
+
+    for i in frames_to_test:
+        tc = Timecode(framerate, frames=i)
+        from_float = Timecode(framerate, start_seconds=tc.float)
+        if tc != from_float:
+            mismatched += 1
+
+    tested = len(frames_to_test)
+    assert mismatched == 0, f"{mismatched}/{tested} ({mismatched / tested * 100:.1f}%) incorrect (sampled {tested} of {num_frames} total frames)"
 
 
 @pytest.mark.parametrize(
