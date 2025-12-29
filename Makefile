@@ -43,6 +43,8 @@ clean: FORCE
 	-rm -rf $(VIRTUALENV_DIR)
 	-rm -rf dist
 	-rm -rf build
+	-rm -Rf src/$(PACKAGE_NAME)/__pycache__
+	-rm -Rf tests/__pycache__
 
 clean-all: clean
 	@printf "\n\033[36m--- $@: Clean All---\033[0m\n"
@@ -52,8 +54,7 @@ clean-all: clean
 	-rm -f main.py
 	-rm -Rf htmlcov
 	-rm .coverage.*
-	-rm MANIFEST.in
-	-rm -Rf $(PACKAGE_NAME).egg-info
+	-rm -Rf src/$(PACKAGE_NAME).egg-info
 	-rm -Rf $(VIRTUALENV_DIR)
 
 html:
